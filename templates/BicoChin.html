@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بی کو چین  </title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #000;
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            width: 100%;
+            text-align: center;
+            padding: 20px;
+            background-color: rgba(30, 30, 30, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 0 25px rgba(0, 150, 255, 0.3);
+            border: 1px solid #333;
+        }
+        
+        h1 {
+            color: #4da6ff;
+            margin-bottom: 20px;
+            font-size: 2.2rem;
+            text-shadow: 0 0 10px rgba(77, 166, 255, 0.5);
+        }
+        
+        .image-container {
+            width: 100%;
+            min-height: 450px;
+            margin: 20px 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border: 2px solid #333;
+            position: relative;
+        }
+        
+        #displayed-image {
+            max-width: 100%;
+            max-height: 450px;
+            object-fit: contain;
+            border-radius: 8px;
+            display: none;
+        }
+        
+        .placeholder {
+            font-size: 1.2rem;
+            color: #888;
+        }
+        
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 15px 35px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            min-width: 180px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        #start-btn {
+            background: linear-gradient(to left, #0066cc, #4da6ff);
+            color: white;
+        }
+        
+        #start-btn:hover {
+            background: linear-gradient(to left, #004d99, #3399ff);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 102, 204, 0.4);
+        }
+        
+        #reset-btn {
+            background: linear-gradient(to left, #666, #999);
+            color: white;
+        }
+        
+        #reset-btn:hover {
+            background: linear-gradient(to left, #555, #888);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 255, 255, 0.1);
+        }
+        
+        .random-number-container {
+            margin: 15px 0;
+            padding: 15px;
+            background-color: rgba(40, 40, 40, 0.8);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .random-number-title {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: #4da6ff;
+        }
+        
+        .random-number {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #ffcc00;
+            text-shadow: 0 0 10px rgba(255, 204, 0, 0.5);
+            min-height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: rgba(0, 0, 0, 0.5);
+            margin: 10px auto;
+            border: 3px solid #ffcc00;
+        }
+        
+        .counter {
+            margin-top: 15px;
+            font-size: 1.1rem;
+            color: #4da6ff;
+        }
+        
+        /* رسپانسیو */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .image-container {
+                min-height: 350px;
+            }
+            
+            #displayed-image {
+                max-height: 350px;
+            }
+            
+            button {
+                padding: 12px 25px;
+                font-size: 1.1rem;
+                min-width: 150px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            button {
+                width: 100%;
+                max-width: 250px;
+            }
+            
+            .image-container {
+                min-height: 280px;
+            }
+            
+            #displayed-image {
+                max-height: 280px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>بی کو چین</h1>
+        
+        <div class="image-container">
+            <div class="placeholder" id="placeholder-text">هنوز عکسی انتخاب نشده است</div>
+            <img id="displayed-image" alt="عکس انتخاب شده">
+        </div>
+        
+        <div class="random-number-container">
+            <div class="random-number-title">امتیاز کارت</div>
+            <div class="random-number" id="random-number">-</div>
+        </div>
+        
+        <div class="counter">
+            <p>تعداد نمایش عکس‌ها: <span id="counter">0</span></p>
+        </div>
+        
+        <div class="buttons">
+            <button id="start-btn">تاس رو بریز</button>
+            <button id="reset-btn">تاس رو دوباره بریز</button>
+        </div>
+    </div>
+
+    <script>
+        // آدرس عکس‌ها را در این آرایه قرار دهید
+        // لطفاً آدرس واقعی عکس‌های خود را جایگزین کنید
+        const imagePaths = [
+            "/static/images/photo1.jpg",
+            "/static/images/photo2.jpg",
+            "/static/images/photo3.jpg",
+            "/static/images/photo4.jpg",
+            "/static/images/photo5.jpg",
+            "/static/images/photo6.jpg",
+            "/static/images/photo7.jpg",
+            "/static/images/photo8.jpg",
+            "/static/images/photo9.jpg",
+            "/static/images/photo10.jpg",
+            "/static/images/photo11.jpg",
+            "/static/images/photo12.jpg",
+            "/static/images/photo13.jpg",
+            "/static/images/photo14.jpg",
+            "/static/images/photo15.jpg",
+            "/static/images/photo16.jpg",
+            "/static/images/photo17.jpg"
+        ];
+        
+        // عناصر DOM
+        const startBtn = document.getElementById('start-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const displayedImage = document.getElementById('displayed-image');
+        const placeholderText = document.getElementById('placeholder-text');
+        const randomNumberElement = document.getElementById('random-number');
+        const counterElement = document.getElementById('counter');
+        
+        // متغیرهای برنامه
+        let currentImageIndex = -1;
+        let displayCounter = 0;
+        
+        // تابع تولید عدد تصادفی بین ۱ تا ۴
+        function getRandomNumber() {
+            return Math.floor(Math.random() * 4) + 1;
+        }
+        
+        // تابع انتخاب تصادفی عکس
+        function getRandomImage() {
+            // اطمینان از انتخاب عکس متفاوت (در صورت وجود بیش از یک عکس)
+            let newIndex;
+            do {
+                newIndex = Math.floor(Math.random() * imagePaths.length);
+            } while (newIndex === currentImageIndex && imagePaths.length > 1);
+            
+            currentImageIndex = newIndex;
+            return imagePaths[currentImageIndex];
+        }
+        
+        // تابع نمایش عکس
+        function displayImage() {
+            const imagePath = getRandomImage();
+            const randomNum = getRandomNumber();
+            
+            // نمایش عکس
+            displayedImage.src = imagePath;
+            displayedImage.style.display = 'block';
+            placeholderText.style.display = 'none';
+            
+            // نمایش عدد شانسی
+            randomNumberElement.textContent = randomNum;
+            
+            // افزایش شمارنده
+            displayCounter++;
+            counterElement.textContent = displayCounter;
+            
+            // اضافه کردن افکت نمایش
+            displayedImage.style.opacity = '0';
+            displayedImage.style.transform = 'scale(0.9)';
+            
+            setTimeout(() => {
+                displayedImage.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                displayedImage.style.opacity = '1';
+                displayedImage.style.transform = 'scale(1)';
+            }, 50);
+            
+            // افکت برای عدد شانسی
+            randomNumberElement.style.transform = 'scale(0.5)';
+            randomNumberElement.style.opacity = '0.5';
+            
+            setTimeout(() => {
+                randomNumberElement.style.transition = 'transform 0.5s ease, opacity 0.5s ease';
+                randomNumberElement.style.transform = 'scale(1)';
+                randomNumberElement.style.opacity = '1';
+            }, 100);
+        }
+        
+        // تابع ریست
+        function resetDisplay() {
+            displayedImage.style.display = 'none';
+            placeholderText.style.display = 'block';
+            randomNumberElement.textContent = '-';
+        }
+        
+        // رویدادهای دکمه‌ها
+        startBtn.addEventListener('click', displayImage);
+        resetBtn.addEventListener('click', resetDisplay);
+        
+        // راهنمایی در کنسول
+        console.log("برای استفاده از برنامه:");
+        console.log("1. عکس‌های خود را در یک پوشه قرار دهید");
+        console.log("2. آدرس صحیح عکس‌ها را در آرایه imagePaths در خط 118 کد وارد کنید");
+        console.log("3. با هر بار کلیک روی دکمه 'شروع نمایش'، یک عدد شانسی ۱ تا ۴ هم نمایش داده می‌شود");
+    </script>
+</body>
+</html>

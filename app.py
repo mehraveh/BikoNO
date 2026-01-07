@@ -3,9 +3,20 @@ from flask import Flask, render_template, send_from_directory
 app = Flask(__name__)
 
 @app.get("/")
-def home():
+def index():
+    # main page to choose games
     return render_template("index.html")
 
+@app.get("/games/bikono")
+def bikono():
+    return render_template("BicoNo.html")
+
+@app.get("/games/bicochin")
+def other_game():
+    return render_template("BicoChin.html")
+
+
+# --- PWA files (keep as you had) ---
 @app.get("/sw.js")
 def sw():
     return send_from_directory("static", "sw.js")
@@ -22,6 +33,6 @@ def icon192():
 def icon512():
     return send_from_directory("static/icons", "icon-512.png")
 
+
 if __name__ == "__main__":
-    print("Starting Bikono...")
     app.run(host="127.0.0.1", port=5000, debug=True)

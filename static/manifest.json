@@ -1,7 +1,7 @@
 {
-    "name": "Bikono",
-    "short_name": "Bikono",
-    "description": "Bikono web app",
+    "name": "BicoGames",
+    "short_name": "BicoGames",
+    "description": "BicoGames web app",
     "start_url": "/",
     "scope": "/",
     "display": "standalone",
