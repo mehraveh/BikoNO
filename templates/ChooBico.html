@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>چوبیکو آنلاین</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: #000000;
+            color: #eee;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            transition: background-color 0.5s;
+        }
+        
+        /* صفحه انتخاب سطح */
+        .difficulty-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            min-height: 100vh;
+            text-align: center;
+        }
+        
+        .difficulty-title {
+            color: #ffffff;
+            font-size: 42px;
+            margin-bottom: 60px;
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
+            letter-spacing: 2px;
+        }
+        
+        .difficulty-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            width: 100%;
+            max-width: 350px;
+        }
+        
+        .difficulty-btn {
+            padding: 20px 40px;
+            font-size: 24px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background-color: #222222;
+            color: white;
+            border: 3px solid transparent;
+            font-weight: bold;
+            width: 100%;
+        }
+        
+        .difficulty-btn:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .easy-btn {
+            border-color: #2ecc71;
+        }
+        
+        .easy-btn:hover, .easy-btn.active {
+            background-color: #2ecc71;
+            color: #000;
+        }
+        
+        .medium-btn {
+            border-color: #f1c40f;
+        }
+        
+        .medium-btn:hover, .medium-btn.active {
+            background-color: #f1c40f;
+            color: #000;
+        }
+        
+        .hard-btn {
+            border-color: #e74c3c;
+        }
+        
+        .hard-btn:hover, .hard-btn.active {
+            background-color: #e74c3c;
+            color: #000;
+        }
+        
+        /* صفحه اصلی بازی */
+        .game-screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            min-height: 100vh;
+            padding-top: 20px;
+        }
+        
+        .page-title {
+            text-align: center;
+            margin-bottom: 30px;
+            width: 100%;
+        }
+        
+        h1 {
+            color: #ffffff;
+            font-size: 42px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+        }
+        
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 400px;
+            margin-bottom: 30px;
+            padding: 0 10px;
+        }
+        
+        .timer-container {
+            font-size: 24px;
+            color: #ffffff;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 10px 25px;
+            border-radius: 8px;
+            border: 2px solid #2ecc71;
+            display: inline-block;
+            min-width: 120px;
+            text-align: center;
+        }
+        
+        .controls-container {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .start-btn {
+            padding: 15px 30px;
+            font-size: 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background-color: #222222;
+            color: white;
+            border: 3px solid #2ecc71;
+            font-weight: bold;
+            min-width: 120px;
+        }
+        
+        .start-btn:hover {
+            transform: scale(1.08);
+            background-color: #333333;
+        }
+        
+        .start-btn.stop {
+            border-color: #e74c3c;
+        }
+        
+        .game-container {
+            position: relative;
+            margin: 20px 0;
+        }
+        
+        .grid {
+            position: relative;
+            width: 400px;
+            height: 400px;
+        }
+        
+        .point {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background-color: #888888;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2;
+        }
+        
+        .line {
+            position: absolute;
+            background-color: transparent;
+            transform-origin: 0 0;
+            z-index: 1;
+        }
+        
+        .line.active {
+            background-color: #ffffff;
+        }
+        
+        .line.horizontal {
+            height: 4px;
+        }
+        
+        .line.vertical {
+            width: 4px;
+        }
+        
+        .pattern-section {
+            margin-top: 30px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            width: 100%;
+        }
+        
+        .pattern-button {
+            padding: 20px 40px;
+            font-size: 24px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background-color: #333333;
+            color: white;
+            border: 3px solid #3498db;
+            font-weight: bold;
+            width: 250px;
+        }
+        
+        .pattern-button:hover {
+            transform: scale(1.08);
+            background-color: #444444;
+            border-color: #2980b9;
+        }
+        
+        .pattern-button-label {
+            font-size: 14px;
+            color: #bbb;
+            margin-top: 5px;
+        }
+        
+        .return-btn {
+            padding: 15px 30px;
+            font-size: 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background-color: #333333;
+            color: white;
+            border: 2px solid #666666;
+            font-weight: bold;
+            width: 200px;
+            margin-top: 10px;
+        }
+        
+        .return-btn:hover {
+            transform: scale(1.08);
+            background-color: #444444;
+            border-color: #888888;
+        }
+        
+        @media (max-width: 768px) {
+            .game-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .controls-container {
+                flex-direction: column;
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .start-btn {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+        
+        @media (max-width: 500px) {
+            .grid {
+                width: 300px;
+                height: 300px;
+            }
+            
+            .point {
+                width: 10px;
+                height: 10px;
+            }
+            
+            h1 {
+                font-size: 32px;
+            }
+            
+            .difficulty-title {
+                font-size: 32px;
+            }
+            
+            .difficulty-btn {
+                font-size: 20px;
+                padding: 15px 30px;
+            }
+            
+            .pattern-button {
+                width: 200px;
+                padding: 15px 30px;
+                font-size: 20px;
+            }
+            
+            .return-btn {
+                width: 180px;
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- صفحه انتخاب سطح -->
+    <div class="difficulty-screen" id="difficultyScreen">
+        <h1 class="difficulty-title">چوبیکو آنلاین</h1>
+        <div class="difficulty-buttons">
+            <button class="difficulty-btn easy-btn" data-level="easy">آسان</button>
+            <button class="difficulty-btn medium-btn" data-level="medium">متوسط</button>
+            <button class="difficulty-btn hard-btn" data-level="hard">سخت</button>
+        </div>
+    </div>
+    
+    <!-- صفحه اصلی بازی -->
+    <div class="game-screen" id="gameScreen">
+        <!-- عنوان اصلی بالای همه چیز -->
+        <div class="page-title">
+            <h1>چوبیکو آنلاین</h1>
+        </div>
+        
+        <!-- بخش تایمر و دکمه شروع -->
+        <div class="game-header">
+            <div class="timer-container" id="timer">۰۰:۰۰</div>
+            <div class="controls-container">
+                <button class="start-btn" id="startBtn">شروع</button>
+            </div>
+        </div>
+        
+        <!-- صفحه بازی -->
+        <div class="game-container">
+            <div class="grid" id="gameGrid">
+                <!-- نقاط و خطوط توسط جاوااسکریپت ایجاد می‌شوند -->
+            </div>
+        </div>
+        
+        <!-- بخش دکمه‌های الگو و بازگشت -->
+        <div class="pattern-section">
+            <div class="pattern-button-container">
+                <button class="pattern-button" id="randomLinesBtn">
+                    ساخت الگوها
+                </button>
+                <div class="pattern-button-label">برای تولید الگوهای تصادفی کلیک کنید</div>
+            </div>
+            
+            <button class="return-btn" id="backBtn">بازگشت</button>
+        </div>
+    </div>
+
+    <script>
+        // تنظیمات بازی
+        const GRID_SIZE = 4;
+        const LINE_WIDTH = 100;
+        
+        // متغیرهای بازی
+        let difficulty = 'medium'; // پیش‌فرض: متوسط
+        let lineCount = 7; // پیش‌فرض: 7 خط
+        let timerInterval = null;
+        let seconds = 0;
+        let isTimerRunning = false;
+        
+        // عناصر DOM
+        const difficultyScreen = document.getElementById('difficultyScreen');
+        const gameScreen = document.getElementById('gameScreen');
+        const gameGrid = document.getElementById('gameGrid');
+        const randomLinesBtn = document.getElementById('randomLinesBtn');
+        const timerElement = document.getElementById('timer');
+        const startBtn = document.getElementById('startBtn');
+        const backBtn = document.getElementById('backBtn');
+        const difficultyButtons = document.querySelectorAll('.difficulty-btn');
+        
+        // ذخیره‌سازی خطوط
+        let horizontalLines = [];
+        let verticalLines = [];
+        let activeLines = new Set();
+        
+        // رویدادهای دکمه‌های سطح دشواری
+        difficultyButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                // حذف کلاس active از همه دکمه‌ها
+                difficultyButtons.forEach(b => b.classList.remove('active'));
+                
+                // اضافه کردن کلاس active به دکمه کلیک شده
+                this.classList.add('active');
+                
+                // تنظیم سطح دشواری
+                difficulty = this.dataset.level;
+                
+                // تنظیم تعداد خطوط بر اساس سطح دشواری
+                switch(difficulty) {
+                    case 'easy':
+                        lineCount = 10;
+                        break;
+                    case 'medium':
+                        lineCount = 7;
+                        break;
+                    case 'hard':
+                        lineCount = 5;
+                        break;
+                }
+                
+                // تغییر به صفحه بازی بعد از 500 میلی‌ثانیه
+                setTimeout(() => {
+                    difficultyScreen.style.display = 'none';
+                    gameScreen.style.display = 'flex';
+                    initGame();
+                }, 500);
+            });
+        });
+        
+        // مدیریت دکمه شروع/پایان
+        startBtn.addEventListener('click', function() {
+            if (!isTimerRunning) {
+                // شروع تایمر
+                startTimer();
+                this.textContent = 'پایان';
+                this.classList.add('stop');
+            } else {
+                // توقف تایمر
+                stopTimer();
+                this.textContent = 'شروع';
+                this.classList.remove('stop');
+            }
+        });
+        
+        // مدیریت دکمه بازگشت
+        backBtn.addEventListener('click', function() {
+            // توقف تایمر
+            stopTimer();
+            
+            // بازگشت به صفحه انتخاب سطح
+            gameScreen.style.display = 'none';
+            difficultyScreen.style.display = 'flex';
+        });
+        
+        // تابع شروع تایمر
+        function startTimer() {
+            isTimerRunning = true;
+            seconds = 0;
+            updateTimerDisplay();
+            
+            timerInterval = setInterval(() => {
+                seconds++;
+                updateTimerDisplay();
+            }, 1000);
+        }
+        
+        // تابع توقف تایمر
+        function stopTimer() {
+            isTimerRunning = false;
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+        }
+        
+        // تابع به‌روزرسانی نمایش تایمر
+        function updateTimerDisplay() {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            
+            const formattedMinutes = minutes.toString().padStart(2, '۰');
+            const formattedSeconds = remainingSeconds.toString().padStart(2, '۰');
+            
+            timerElement.textContent = `${formattedMinutes}:${formattedSeconds}`;
+        }
+        
+        // ایجاد نقاط بازی
+        function createPoints() {
+            gameGrid.innerHTML = '';
+            
+            for (let row = 0; row < GRID_SIZE; row++) {
+                for (let col = 0; col < GRID_SIZE; col++) {
+                    const point = document.createElement('div');
+                    point.className = 'point';
+                    point.style.left = `${col * LINE_WIDTH}px`;
+                    point.style.top = `${row * LINE_WIDTH}px`;
+                    point.dataset.row = row;
+                    point.dataset.col = col;
+                    gameGrid.appendChild(point);
+                }
+            }
+        }
+        
+        // ایجاد خطوط افقی و عمودی
+        function createAllLines() {
+            // پاکسازی آرایه‌ها
+            horizontalLines = [];
+            verticalLines = [];
+            activeLines.clear();
+            
+            // ایجاد خطوط افقی
+            for (let row = 0; row < GRID_SIZE; row++) {
+                for (let col = 0; col < GRID_SIZE - 1; col++) {
+                    const lineId = `h_${row}_${col}`;
+                    const line = document.createElement('div');
+                    line.id = lineId;
+                    line.className = 'line horizontal';
+                    line.style.left = `${col * LINE_WIDTH + 6}px`;
+                    line.style.top = `${row * LINE_WIDTH - 2}px`;
+                    line.style.width = `${LINE_WIDTH - 12}px`;
+                    line.dataset.row = row;
+                    line.dataset.col = col;
+                    line.dataset.type = 'horizontal';
+                    gameGrid.appendChild(line);
+                    horizontalLines.push(lineId);
+                }
+            }
+            
+            // ایجاد خطوط عمودی
+            for (let row = 0; row < GRID_SIZE - 1; row++) {
+                for (let col = 0; col < GRID_SIZE; col++) {
+                    const lineId = `v_${row}_${col}`;
+                    const line = document.createElement('div');
+                    line.id = lineId;
+                    line.className = 'line vertical';
+                    line.style.left = `${col * LINE_WIDTH - 2}px`;
+                    line.style.top = `${row * LINE_WIDTH + 6}px`;
+                    line.style.height = `${LINE_WIDTH - 12}px`;
+                    line.dataset.row = row;
+                    line.dataset.col = col;
+                    line.dataset.type = 'vertical';
+                    gameGrid.appendChild(line);
+                    verticalLines.push(lineId);
+                }
+            }
+        }
+        
+        // تولید خطوط تصادفی
+        function generateRandomLines() {
+            // غیرفعال کردن همه خطوط قبلی
+            activeLines.forEach(lineId => {
+                const line = document.getElementById(lineId);
+                if (line) line.classList.remove('active');
+            });
+            
+            activeLines.clear();
+            
+            // لیست تمام خطوط ممکن
+            const allLines = [...horizontalLines, ...verticalLines];
+            
+            // انتخاب خطوط تصادفی بدون تکرار (بر اساس سطح دشواری)
+            const selectedLines = [];
+            const shuffledLines = [...allLines].sort(() => Math.random() - 0.5);
+            
+            // تعداد خطوط بر اساس سطح دشواری
+            const count = lineCount;
+            
+            for (let i = 0; i < count && i < shuffledLines.length; i++) {
+                selectedLines.push(shuffledLines[i]);
+            }
+            
+            // فعال کردن خطوط انتخاب شده
+            selectedLines.forEach(lineId => {
+                const line = document.getElementById(lineId);
+                if (line) {
+                    line.classList.add('active');
+                    activeLines.add(lineId);
+                }
+            });
+            
+            return selectedLines;
+        }
+        
+        // راه‌اندازی اولیه بازی
+        function initGame() {
+            createPoints();
+            createAllLines();
+            generateRandomLines();
+            
+            // اضافه کردن رویداد کلیک به دکمه ساخت الگوها
+            randomLinesBtn.addEventListener('click', generateRandomLines);
+            
+            // توقف تایمر اگر در حال اجراست
+            stopTimer();
+            startBtn.textContent = 'شروع';
+            startBtn.classList.remove('stop');
+            seconds = 0;
+            updateTimerDisplay();
+        }
+        
+        // شروع بازی هنگامی که صفحه بارگیری شد
+        window.addEventListener('DOMContentLoaded', function() {
+            // نمایش صفحه انتخاب سطح به عنوان صفحه اول
+            difficultyScreen.style.display = 'flex';
+            gameScreen.style.display = 'none';
+        });
+        
+        // برای نمایش بهتر در موبایل
+        window.addEventListener('resize', function() {
+            if (window.innerWidth < 500) {
+                gameGrid.style.width = '300px';
+                gameGrid.style.height = '300px';
+            } else {
+                gameGrid.style.width = '400px';
+                gameGrid.style.height = '400px';
+            }
+        });
+    </script>
+</body>
+</html>

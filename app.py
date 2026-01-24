@@ -12,9 +12,13 @@ def bikono():
     return render_template("BicoNo.html")
 
 @app.get("/games/bicochin")
-def other_game():
+def bicochin():
     return render_template("BicoChin.html")
 
+@app.get("/games/choobico")
+def choobico():
+    return render_template("Choobico.html")
+  
 
 # --- PWA files (keep as you had) ---
 @app.get("/sw.js")
