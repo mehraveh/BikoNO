@@ -194,7 +194,21 @@
       resetLights();
       countdownSequence();
     }
+    function playBeep() {
+    const context = new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = context.createOscillator();
+    const gainNode = context.createGain();
 
+    oscillator.type = 'sine';
+    oscillator.frequency.setValueAtTime(440, context.currentTime); // A4 note
+    gainNode.gain.setValueAtTime(0.2, context.currentTime); // volume
+
+    oscillator.connect(gainNode);
+    gainNode.connect(context.destination);
+
+    oscillator.start();
+    oscillator.stop(context.currentTime + 0.2); // beep lasts 0.2 seconds
+}
     function countdownSequence() {
       const steps = [
         {text: 'Ready...', delay: 1000},
@@ -219,22 +233,27 @@
     }
 
     function activateLights() {
-      const color1 = light1Colors[Math.floor(Math.random() * light1Colors.length)];
-      const color2 = light2Colors[Math.floor(Math.random() * light2Colors.length)];
+    const color1 = light1Colors[Math.floor(Math.random() * light1Colors.length)];
+    const color2 = light2Colors[Math.floor(Math.random() * light2Colors.length)];
 
-      light1El.style.background = color1;
-      light2El.style.background = color2;
+    light1El.style.background = color1;
+    light2El.style.background = color2;
 
-      light1El.classList.add('active');
-      light2El.classList.add('active');
+    light1El.classList.add('active');
+    light2El.classList.add('active');
 
-      statusEl.textContent = 'Lights activated with random colors!';
+    statusEl.textContent = 'Lights activated with random colors!';
 
-      setTimeout(() => {
+    // 30% chance to play beep
+    if (Math.random() < 0.3) {
+        playBeep();
+    }
+
+    setTimeout(() => {
         light1El.style.boxShadow = `inset 0 0 50px rgba(255, 255, 255, 0.4), 0 0 80px ${color1}`;
         light2El.style.boxShadow = `inset 0 0 50px rgba(255, 255, 255, 0.4), 0 0 80px ${color2}`;
-      },100);
-    }
+    }, 100);
+}
 
     function showWaiting() {
       statusEl.textContent = 'Waiting for restart...';
